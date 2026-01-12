@@ -4,72 +4,55 @@ const path = require("path");
 const fs = require("fs");
 
 const app = express();
-const PORT = 4000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../frontend")));
 
-// ---------- NORMALIZE (MUST BE FIRST) ----------
+// ================= NORMALIZE =================
 const normalize = (addr) =>
   typeof addr === "string"
     ? addr.toLowerCase().replace(/^0x0+/, "0x")
     : null;
 
-// ---------- LOAD DATA ----------
+// ================= LOAD DATA =================
 const registrationsPath = path.join(
   __dirname,
   "data",
   "zama_registrations_map.json"
 );
-const ogMintersPath = path.join(__dirname, "data", "og_minters.json");
+
+const ogMintersPath = path.join(
+  __dirname,
+  "data",
+  "og_minters.json"
+);
 
 let registrations = {};
-
-const express = require("express");
-const path = require("path");
-
-const app = express();
-
-app.use(express.json());
-
-// ✅ serve frontend files
-app.use(express.static(path.join(__dirname, "..")));
-
-// ✅ API test
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok" });
-});
-
-// ❌ NO app.listen
-module.exports = app;
 let ogMinters = new Set();
 
-// Load registrations
+// registrations
 try {
   registrations = JSON.parse(fs.readFileSync(registrationsPath, "utf-8"));
-  console.log("✅ Registrations loaded:", Object.keys(registrations).length);
+  console.log("✅ Registrations:", Object.keys(registrations).length);
 } catch (e) {
-  console.error("❌ Failed to load registrations", e);
+  console.error("❌ registrations load failed", e);
 }
 
-// Load OG minters (SAFE)
+// OG minters
 try {
   const og = JSON.parse(fs.readFileSync(ogMintersPath, "utf-8"));
-
   og
     .filter(a => typeof a === "string" && a.startsWith("0x"))
     .forEach(a => ogMinters.add(normalize(a)));
 
-  console.log("⭐️ OG minters loaded:", ogMinters.size);
+  console.log("⭐ OG Minters:", ogMinters.size);
 } catch (e) {
-  console.error("❌ Failed to load OG minters", e);
+  console.error("❌ og minters load failed", e);
 }
 
-// ---------- BUILD EVENTS ----------
+// ================= BUILD EVENTS =================
 const events = Object.entries(registrations).map(([address, data]) => {
   const addr = normalize(address);
-
   return {
     address: addr,
     tx: data.tx,
@@ -81,34 +64,33 @@ const events = Object.entries(registrations).map(([address, data]) => {
   };
 });
 
-// ---------- STATS ----------
+// ================= API ROUTES =================
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
 app.get("/api/stats", (req, res) => {
   const registeredSet = new Set(
-    Object.keys(registrations)
-      .map(normalize)
-      .filter(Boolean)
+    Object.keys(registrations).map(normalize).filter(Boolean)
   );
 
-  const ogSet = new Set([...ogMinters]);
-
   let totalOgRegistered = 0;
-  for (const addr of ogSet) {
+  for (const addr of ogMinters) {
     if (registeredSet.has(addr)) totalOgRegistered++;
   }
 
   res.json({
     totalRegistered: registeredSet.size,
     uniqueAddresses: registeredSet.size,
-    ogMinters: ogSet.size,              // total wallets that minted OG
-    totalOgRegistered                   // intersection (THIS WAS 0 BEFORE)
+    ogMinters: ogMinters.size,
+    totalOgRegistered
   });
 });
 
-// ---------- ALL TRANSACTIONS ----------
-app.get("/api/events", (req, res) => {res.json(events);
+app.get("/api/events", (req, res) => {
+  res.json(events);
 });
 
-// ---------- SEARCH ----------
 app.get("/api/search/:address", (req, res) => {
   const q = normalize(req.params.address);
   const found = events.filter(e => e.address === q);
@@ -121,10 +103,13 @@ app.get("/api/search/:address", (req, res) => {
   });
 });
 
-// ---------- FALLBACK ----------
+// ================= FRONTEND =================
+// frontend files are in ROOT now
+app.use(express.static(path.join(__dirname, "..")));
+
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+  res.sendFile(path.join(__dirname, "..", "index.html"));
 });
 
-// ---------- START ----------
+// ================= EXPORT (NO LISTEN) =================
 module.exports = app;
