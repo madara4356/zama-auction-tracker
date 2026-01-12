@@ -15,8 +15,17 @@ const normalize = (addr) =>
     : null;
 
 // ================= LOAD DATA =================
-const registrationsPath = path.join(__dirname, "data", "zama_registrations_map.json");
-const ogMintersPath = path.join(__dirname, "data", "og_minters.json");
+const registrationsPath = path.join(
+  __dirname,
+  "data",
+  "zama_registrations_map.json"
+);
+
+const ogMintersPath = path.join(
+  __dirname,
+  "data",
+  "og_minters.json"
+);
 
 let registrations = {};
 let ogMinters = new Set();
@@ -30,7 +39,8 @@ try {
 
 try {
   const og = JSON.parse(fs.readFileSync(ogMintersPath, "utf-8"));
-  og.filter(a => typeof a === "string" && a.startsWith("0x"))
+  og
+    .filter(a => typeof a === "string" && a.startsWith("0x"))
     .forEach(a => ogMinters.add(normalize(a)));
   console.log("⭐ OG Minters:", ogMinters.size);
 } catch (e) {
@@ -50,9 +60,6 @@ const events = Object.entries(registrations).map(([address, data]) => {
     ogRegistered: ogMinters.has(addr)
   };
 });
-
-// ================= FRONTEND =================
-app.use(express.static(path.join(__dirname, "..")));
 
 // ================= API ROUTES =================
 app.get("/api/health", (req, res) => {
@@ -93,10 +100,11 @@ app.get("/api/search/:address", (req, res) => {
   });
 });
 
-// ================= FALLBACK =================
-app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "index.html"));
-});
+// ================= FRONTEND (STATIC ONLY) =================
+// ✅ This allows index.html, style.css, frontend.js to load correctly
+app.use(express.static(path.join(__dirname, "..")));
 
 // ================= EXPORT =================
+// ❌ NO app.listen
+// ❌ NO wildcard fallback
 module.exports = app;
