@@ -1,97 +1,157 @@
-const el = (id) => document.getElementById(id);
+// =======================
+// CONFIG
+// =======================
+let PAGE_SIZE = 25;
+let currentPage = 1;
+let allEvents = [];
 
-let events = [];
-let page = 1;
-let pageSize = 25;
+// =======================
+// HELPERS
+// =======================
+function shortAddr(addr) {
+  if (!addr || addr.length < 10) return addr;
+  return addr.slice(0, 6) + "..." + addr.slice(-4);
+}
 
-// ---------------- STATS ----------------
+function formatTime(ts) {
+  return new Date(ts).toLocaleString();
+}
+
+function normalize(addr) {
+  return addr.toLowerCase().replace(/^0x0+/, "0x");
+}
+
+function timeAgo(ts) {
+  const diff = Math.floor((Date.now() - new Date(ts)) / 1000);
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
+
+// =======================
+// LOAD STATS
+// =======================
 async function loadStats() {
   const res = await fetch("/api/stats");
-  const data = await res.json();
+  const stats = await res.json();
 
-  el("totalRegistered").textContent = data.totalRegistered;
-  el("ogMinters").textContent = data.ogMinters;
-  el("uniqueAddresses").textContent = data.uniqueAddresses;
-  el("totalOgRegistered").textContent = data.totalOgRegistered;
+  document.getElementById("totalRegistered").innerText = stats.totalRegistered;
+  document.getElementById("ogMinters").innerText = stats.ogMinters;
+  document.getElementById("uniqueAddresses").innerText = stats.uniqueAddresses;
+  document.getElementById("totalOgRegistered").innerText = stats.totalOgRegistered;
 }
 
-// ---------------- EVENTS ----------------
+// =======================
+// LOAD EVENTS
+// =======================
 async function loadEvents() {
   const res = await fetch("/api/events");
-  events = await res.json();
-  renderTable();
+  allEvents = await res.json();
+  currentPage = 1;
+  renderEvents();
 }
 
-// ---------------- TABLE ----------------
-function renderTable() {
-  const body = el("eventsBody");
-  body.innerHTML = "";
+// =======================
+// RENDER EVENTS
+// =======================
+function renderEvents(events = allEvents) {
+  const tbody = document.getElementById("eventsBody");
+  const cards = document.getElementById("cardsView");
 
-  const start = (page - 1) * pageSize;
-  const slice = events.slice(start, start + pageSize);
+  tbody.innerHTML = "";
+  cards.innerHTML = "";
 
-  slice.forEach(e => {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageData = events.slice(start, start + PAGE_SIZE);
+
+  if (!pageData.length) return;
+
+  pageData.forEach(e => {
+    // TABLE (DESKTOP)
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>Register</td>
-      <td>${e.address.slice(0, 6)}...${e.address.slice(-4)}</td>
-      <td>${e.tx.slice(0, 6)}...${e.tx.slice(-4)}</td>
+      <td>Verified</td>
+      <td title="${e.address}">${shortAddr(e.address)}</td>
+      <td title="${e.tx}">${shortAddr(e.tx)}</td>
       <td>${e.block}</td>
-      <td>${new Date(e.time).toLocaleString()}</td>
-      <td>Success</td>
-      <td>${e.og ? "✅" : "❌"}</td>
+      <td>${formatTime(e.time)}</td>
+      <td class="success">success</td>
+      <td>${e.og ? "⭐️ YES" : "NO"}</td>
     `;
-    body.appendChild(tr);
+    tbody.appendChild(tr);
+
+    // CARD (MOBILE)
+    const card = document.createElement("div");
+    card.className = "tx-card";
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="pill verified">✔️ Verified</span>
+        ${e.og ? `<span class="pill og">👑 OG</span>` : ""}
+        <span class="pill success">Success</span>
+      </div>
+
+      <div class="card-body">
+        <div><span>User</span><b>${shortAddr(e.address)}</b></div>
+        <div><span>Tx</span><b>${shortAddr(e.tx)}</b></div>
+        <div><span>Block</span><b>${e.block}</b></div>
+        <div><span>Age</span><b>${timeAgo(e.time)}</b></div>
+      </div>
+    `;
+    cards.appendChild(card);
   });
 
-  el("pageInfo").textContent = `Page ${page}`;
+  document.getElementById("pageInfo").innerText =
+    `Page ${currentPage} / ${Math.ceil(events.length / PAGE_SIZE)}`;
 }
 
-// ---------------- SEARCH ----------------
-async function checkWallet() {
-  const addr = el("walletInput").value.trim();
-
-  if (!addr.startsWith("0x")) {
-    alert("Invalid address");
-    return;
-  }
-
-  const res = await fetch(`/api/search/${addr}`);
-  if (!res.ok) {
-    alert("Search failed");
-    return;
-  }
-
-  const data = await res.json();
-
-  alert(
-    `Registered: ${data.registered}\n` +
-    `OG: ${data.og}\n` +
-    `Events: ${data.count}`
-  );
-}
-
-// ---------------- PAGINATION ----------------
+// =======================
+// PAGINATION
+// =======================
 function nextPage() {
-  if (page * pageSize < events.length) {
-    page++;
-    renderTable();
+  if (currentPage * PAGE_SIZE < allEvents.length) {
+    currentPage++;
+    renderEvents();
   }
 }
 
 function prevPage() {
-  if (page > 1) {
-    page--;
-    renderTable();
+  if (currentPage > 1) {
+    currentPage--;
+    renderEvents();
   }
 }
 
-function changePageSize(v) {
-  pageSize = Number(v);
-  page = 1;
-  renderTable();
+function changePageSize(size) {
+  PAGE_SIZE = parseInt(size, 10);
+  currentPage = 1;
+  renderEvents();
 }
 
-// ---------------- INIT ----------------
-loadStats();
-loadEvents();
+// =======================
+// SEARCH
+// =======================
+async function checkWallet() {
+  const rawInput = document.getElementById("walletInput").value.trim();
+  if (!rawInput) return alert("Enter wallet address");
+
+  const address = normalize(rawInput);
+  const res = await fetch(`/api/search/${address}`);
+  const data = await res.json();
+
+  if (!data.registered) {
+    alert("Wallet not registered");
+    return;
+  }
+
+  currentPage = 1;
+  renderEvents(data.events);
+}
+
+// =======================
+// INIT
+// =======================
+document.addEventListener("DOMContentLoaded", () => {
+  loadStats();
+  loadEvents();
+});
