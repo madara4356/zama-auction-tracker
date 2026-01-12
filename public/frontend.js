@@ -1,7 +1,6 @@
 // =======================
 // CONFIG
 // =======================
-console.log("✅ app.js loaded");
 let PAGE_SIZE = 25;
 let currentPage = 1;
 let allEvents = [];
@@ -37,10 +36,17 @@ async function loadStats() {
   const res = await fetch("/api/stats");
   const stats = await res.json();
 
-  document.getElementById("totalRegistered").innerText = stats.totalRegistered;
-  document.getElementById("ogMinters").innerText = stats.ogMinters;
-  document.getElementById("uniqueAddresses").innerText = stats.uniqueAddresses;
-  document.getElementById("totalOgRegistered").innerText = stats.totalOgRegistered;
+  document.getElementById("totalRegistered").innerText =
+    stats.totalRegistered;
+
+  document.getElementById("ogMinters").innerText =
+    stats.ogMinters;
+
+  document.getElementById("uniqueAddresses").innerText =
+    stats.uniqueAddresses;
+
+  document.getElementById("totalOgRegistered").innerText =
+    stats.totalOgRegistered;
 }
 
 // =======================
@@ -49,12 +55,13 @@ async function loadStats() {
 async function loadEvents() {
   const res = await fetch("/api/events");
   allEvents = await res.json();
+
   currentPage = 1;
   renderEvents();
 }
 
 // =======================
-// RENDER EVENTS
+// RENDER EVENTS (DESKTOP + MOBILE)
 // =======================
 function renderEvents(events = allEvents) {
   const tbody = document.getElementById("eventsBody");
@@ -66,10 +73,14 @@ function renderEvents(events = allEvents) {
   const start = (currentPage - 1) * PAGE_SIZE;
   const pageData = events.slice(start, start + PAGE_SIZE);
 
-  if (!pageData.length) return;
+  if (!pageData.length) {
+    tbody.innerHTML =
+      `<tr><td colspan="7">No transactions found</td></tr>`;
+    return;
+  }
 
   pageData.forEach(e => {
-    // TABLE (DESKTOP)
+    // ===== TABLE (DESKTOP) =====
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>Verified</td>
@@ -82,12 +93,12 @@ function renderEvents(events = allEvents) {
     `;
     tbody.appendChild(tr);
 
-    // CARD (MOBILE)
+    // ===== CARD (MOBILE) =====
     const card = document.createElement("div");
     card.className = "tx-card";
     card.innerHTML = `
       <div class="card-header">
-        <span class="pill verified">✔️ Verified</span>
+        <span class="pill verified">✔ Verified</span>
         ${e.og ? `<span class="pill og">👑 OG</span>` : ""}
         <span class="pill success">Success</span>
       </div>
@@ -124,30 +135,60 @@ function prevPage() {
 }
 
 function changePageSize(size) {
-  PAGE_SIZE = parseInt(size, 10);
+  PAGE_SIZE = Number(size);
   currentPage = 1;
   renderEvents();
 }
 
 // =======================
-// SEARCH
+// SEARCH WALLET (FIXED)
 // =======================
 async function checkWallet() {
-  const rawInput = document.getElementById("walletInput").value.trim();
-  if (!rawInput) return alert("Enter wallet address");
+  const input = document.getElementById("walletInput");
+  const raw = input.value.trim();
 
-  const address = normalize(rawInput);
-  const res = await fetch(`/api/search/${address}`);
-  const data = await res.json();
-
-  if (!data.registered) {
-    alert("Wallet not registered");
+  if (!raw) {
+    alert("Enter wallet address");
     return;
   }
 
-  currentPage = 1;
-  renderEvents(data.events);
+  const address = normalize(raw);
+
+  try {
+    const res = await fetch(`/api/search/${address}`);
+    if (!res.ok) {
+      alert("Search failed");
+      return;
+    }
+
+    const data = await res.json();
+
+    if (!data.registered) {
+      alert("Wallet NOT registered");
+      return;
+    }
+
+    currentPage = 1;
+    renderEvents(data.events);
+
+    document.getElementById("pageInfo").innerText =
+      `Found ${data.count} registration(s)`;
+
+  } catch (err) {
+    console.error(err);
+    alert("Search error");
+  }
 }
+
+// =======================
+// RESET VIEW
+// =======================
+function resetView() {
+  document.getElementById("walletInput").value = "";
+  currentPage = 1;
+  renderEvents();
+}
+
 // =======================
 // INIT
 // =======================
@@ -155,8 +196,3 @@ document.addEventListener("DOMContentLoaded", () => {
   loadStats();
   loadEvents();
 });
-function changePageSize(size) {
-  PAGE_SIZE = Number(size);
-  currentPage = 1;
-  renderEvents();
-}
