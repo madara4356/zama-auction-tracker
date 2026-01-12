@@ -42,6 +42,7 @@ async function loadEvents() {
    SEARCH WALLET (FIXED)
 ===================== */
 async function checkWallet() {
+async function checkWallet() {
   const input = document.getElementById("walletInput").value;
   if (!input) {
     alert("Enter wallet address");
@@ -49,13 +50,12 @@ async function checkWallet() {
   }
 
   const address = normalize(input);
-  const url = `/api/search?address=${encodeURIComponent(address)}`;
 
   try {
-    const res = await fetch(url);
+    const res = await fetch(`/api/search/${address}`);
 
     if (!res.ok) {
-      console.error("Search HTTP error", res.status);
+      console.error("HTTP error:", res.status);
       alert("Search failed");
       return;
     }
