@@ -42,7 +42,7 @@ async function loadEvents() {
 
 /* ================= SEARCH ================= */
 async function checkWallet() {
-  const input = document.getElementById("walletInput").value;
+  const input = document.getElementById("walletInput").value.trim();
   if (!input) {
     alert("Enter wallet address");
     return;
@@ -52,24 +52,21 @@ async function checkWallet() {
 
   try {
     const res = await fetch(`/api/search/${address}`);
-    if (!res.ok) {
-      alert("Search failed");
-      return;
-    }
-
     const data = await res.json();
 
+    // ❌ NOT registered
     if (!data.registered) {
       alert("Wallet not registered");
       return;
     }
 
+    // ✅ REGISTERED
     filteredEvents = data.events;
     currentPage = 1;
     renderEvents();
 
   } catch (err) {
-    console.error(err);
+    console.error("Search error:", err);
     alert("Search failed");
   }
 }
