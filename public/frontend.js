@@ -1,3 +1,7 @@
+function normalize(addr) {
+  if (typeof addr !== "string") return "";
+  return addr.toLowerCase().replace(/^0x0+/, "0x");
+}
 let allEvents = [];
 let filteredEvents = [];
 let currentPage = 1;
