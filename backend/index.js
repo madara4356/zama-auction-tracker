@@ -109,6 +109,4 @@ app.get("*", (req, res) => {
 });
 
 // ---------- START ----------
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+module.exports = app;
