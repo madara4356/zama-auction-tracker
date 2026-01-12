@@ -11,7 +11,12 @@ body {
   background: #0b0f14;
   color: #ffffff;
   font-family: Inter, Arial, sans-serif;
-  padding: 30px;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 /* =========================
@@ -24,7 +29,7 @@ h1 {
 
 .subtitle {
   color: #9ca3af;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 /* =========================
@@ -33,7 +38,7 @@ h1 {
 .stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 14px;
   margin-bottom: 20px;
 }
 
@@ -41,10 +46,11 @@ h1 {
   background: #121821;
   padding: 16px;
   border-radius: 12px;
+  text-align: center;
 }
 
 .card span {
-  font-size: 13px;
+  font-size: 12px;
   color: #9ca3af;
 }
 
@@ -71,10 +77,6 @@ h1 {
   color: white;
 }
 
-.search-bar input::placeholder {
-  color: #6b7280;
-}
-
 .search-bar button {
   padding: 12px 20px;
   background: #22c55e;
@@ -88,7 +90,8 @@ h1 {
    TABLE (DESKTOP)
 ========================= */
 .table-wrapper {
-  margin-top: 10px;
+  width: 100%;
+  overflow-x: auto;
 }
 
 table {
@@ -122,13 +125,13 @@ tbody tr {
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin: 20px 0;
+  margin: 24px 0;
 }
 
 .pagination button,
 .pagination select {
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
   border: none;
   background: #121821;
   color: white;
@@ -144,14 +147,17 @@ tbody tr {
 .tx-card {
   background: #0f172a;
   border-radius: 14px;
-  padding: 14px;
+  padding: 16px;
+  width: 100%;
+  max-width: 420px;
   box-shadow: 0 0 0 1px #1f2937;
 }
 
 .card-header {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .pill {
@@ -193,41 +199,34 @@ tbody tr {
 }
 
 /* =========================
-   RESPONSIVE SWITCH
+   RESPONSIVE
 ========================= */
 
-/* DESKTOP */
-@media (min-width: 900px) {
-  .cards-view {
-    display: none;
-  }
-}
-
-/* TABLE OFF ON MOBILE */
-@media (max-width: 899px) {
+/* Hide table on mobile */
+@media (max-width: 900px) {
   table {
     display: none;
   }
+
+  .cards-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+  }
 }
 
-/* MOBILE FIXES */
+/* Mobile tweaks */
 @media (max-width: 768px) {
-
-  body {
-    padding: 16px;
-  }
-
   h1 {
     font-size: 22px;
   }
 
-  /* STATS */
   .stats {
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
   }
 
-  /* SEARCH */
   .search-bar {
     flex-direction: column;
   }
@@ -237,31 +236,13 @@ tbody tr {
     width: 100%;
   }
 
-  /* CARDS */
-  .cards-view {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  .tx-card {
-    width: 100%;
-    max-width: 420px;
-    margin: 0 auto;
-  }
-
-  /* PAGINATION */
   .pagination {
     flex-direction: column;
-    gap: 10px;
   }
 
   .pagination button,
   .pagination select {
-    width: 90%;
+    width: 100%;
     max-width: 320px;
   }
 }
