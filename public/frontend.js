@@ -155,7 +155,8 @@ async function checkWallet() {
   const address = normalize(raw);
 
   try {
-    const res = await fetch(`/api/search/${address}`);
+    const res = await fetch(`/api/search?address=${address}`);
+
     if (!res.ok) {
       alert("Search failed");
       return;
@@ -179,7 +180,6 @@ async function checkWallet() {
     alert("Search error");
   }
 }
-
 // =======================
 // RESET VIEW
 // =======================
