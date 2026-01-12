@@ -1,93 +1,68 @@
-// ================= CONFIG =================
-const API_BASE = "/api";
+const el = (id) => document.getElementById(id);
 
-// ================= STATE =================
 let events = [];
-let currentPage = 1;
+let page = 1;
 let pageSize = 25;
 
-// ================= HELPERS =================
-function shortAddr(addr) {
-  return addr ? addr.slice(0, 6) + "..." + addr.slice(-4) : "";
-}
-
-function el(id) {
-  return document.getElementById(id);
-}
-
-// ================= LOAD STATS =================
+// ---------------- STATS ----------------
 async function loadStats() {
-  const res = await fetch(`${API_BASE}/stats`);
+  const res = await fetch("/api/stats");
   const data = await res.json();
 
-  el("totalRegistered").innerText = data.totalRegistered || 0;
-  el("ogMinters").innerText = data.ogMinters || 0;
-  el("uniqueAddresses").innerText = data.uniqueAddresses || 0;
-  el("totalOgRegistered").innerText = data.totalOgRegistered || 0;
+  el("totalRegistered").textContent = data.totalRegistered;
+  el("ogMinters").textContent = data.ogMinters;
+  el("uniqueAddresses").textContent = data.uniqueAddresses;
+  el("totalOgRegistered").textContent = data.totalOgRegistered;
 }
 
-// ================= LOAD EVENTS =================
+// ---------------- EVENTS ----------------
 async function loadEvents() {
-  const res = await fetch(`${API_BASE}/events`);
+  const res = await fetch("/api/events");
   events = await res.json();
   renderTable();
 }
 
-// ================= RENDER =================
+// ---------------- TABLE ----------------
 function renderTable() {
   const body = el("eventsBody");
   body.innerHTML = "";
 
-  const start = (currentPage - 1) * pageSize;
-  const pageEvents = events.slice(start, start + pageSize);
+  const start = (page - 1) * pageSize;
+  const slice = events.slice(start, start + pageSize);
 
-  for (const e of pageEvents) {
+  slice.forEach(e => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>Register</td>
-      <td>${shortAddr(e.address)}</td>
-      <td>${shortAddr(e.tx)}</td>
+      <td>${e.address.slice(0, 6)}...${e.address.slice(-4)}</td>
+      <td>${e.tx.slice(0, 6)}...${e.tx.slice(-4)}</td>
       <td>${e.block}</td>
       <td>${new Date(e.time).toLocaleString()}</td>
       <td>Success</td>
       <td>${e.og ? "✅" : "❌"}</td>
     `;
     body.appendChild(tr);
-  }
+  });
 
-  el("pageInfo").innerText = `Page ${currentPage}`;
+  el("pageInfo").textContent = `Page ${page}`;
 }
 
-// ================= SEARCH =================
-async async function checkWallet() {
-  const input = el("walletInput").value.trim();
+// ---------------- SEARCH ----------------
+async function checkWallet() {
+  const addr = el("walletInput").value.trim();
 
-  if (!input.startsWith("0x")) {
-    alert("Invalid wallet address");
+  if (!addr.startsWith("0x")) {
+    alert("Invalid address");
     return;
   }
 
-  const res = await fetch(`/api/search/${input}`);
-
+  const res = await fetch(`/api/search/${addr}`);
   if (!res.ok) {
-    alert("API error");
+    alert("Search failed");
     return;
   }
 
-  const text = await res.text();
-
-  if (!text.startsWith("{")) {
-    alert("Backend routing error (HTML returned)");
-    console.error(text);
-    return;
-  }
-
-  const data = JSON.parse(text);
-
-  if (!data.registered) {
-    alert("Wallet not registered");
-    return;
-  }
+  const data = await res.json();
 
   alert(
     `Registered: ${data.registered}\n` +
@@ -95,27 +70,28 @@ async async function checkWallet() {
     `Events: ${data.count}`
   );
 }
-// ================= PAGINATION =================
+
+// ---------------- PAGINATION ----------------
 function nextPage() {
-  if (currentPage * pageSize < events.length) {
-    currentPage++;
+  if (page * pageSize < events.length) {
+    page++;
     renderTable();
   }
 }
 
 function prevPage() {
-  if (currentPage > 1) {
-    currentPage--;
+  if (page > 1) {
+    page--;
     renderTable();
   }
 }
 
-function changePageSize(size) {
-  pageSize = Number(size);
-  currentPage = 1;
+function changePageSize(v) {
+  pageSize = Number(v);
+  page = 1;
   renderTable();
 }
 
-// ================= INIT =================
+// ---------------- INIT ----------------
 loadStats();
 loadEvents();
