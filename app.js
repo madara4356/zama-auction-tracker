@@ -1,6 +1,7 @@
 // =======================
 // CONFIG
 // =======================
+console.log("✅ app.js loaded");
 let PAGE_SIZE = 25;
 let currentPage = 1;
 let allEvents = [];
