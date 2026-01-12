@@ -59,7 +59,7 @@ function renderTable() {
 }
 
 // ================= SEARCH =================
-async function checkWallet() {
+async async function checkWallet() {
   const input = el("walletInput").value.trim();
 
   if (!input.startsWith("0x")) {
@@ -67,26 +67,34 @@ async function checkWallet() {
     return;
   }
 
-  try {
-    const res = await fetch(`${API_BASE}/search/${input}`);
-    const data = await res.json();
+  const res = await fetch(`/api/search/${input}`);
 
-    if (!data.registered) {
-      alert("Wallet not registered");
-      return;
-    }
-
-    alert(
-      `Registered: ${data.registered}\n` +
-      `OG: ${data.og}\n` +
-      `Events: ${data.count}`
-    );
-  } catch (err) {
-    console.error(err);
-    alert("Search failed");
+  if (!res.ok) {
+    alert("API error");
+    return;
   }
-}
 
+  const text = await res.text();
+
+  if (!text.startsWith("{")) {
+    alert("Backend routing error (HTML returned)");
+    console.error(text);
+    return;
+  }
+
+  const data = JSON.parse(text);
+
+  if (!data.registered) {
+    alert("Wallet not registered");
+    return;
+  }
+
+  alert(
+    `Registered: ${data.registered}\n` +
+    `OG: ${data.og}\n` +
+    `Events: ${data.count}`
+  );
+}
 // ================= PAGINATION =================
 function nextPage() {
   if (currentPage * pageSize < events.length) {
