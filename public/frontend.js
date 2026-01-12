@@ -1,127 +1,137 @@
-// =======================
-// CONFIG
-// =======================
-let PAGE_SIZE = 25;
-let currentPage = 1;
 let allEvents = [];
+let filteredEvents = [];
+let currentPage = 1;
+let pageSize = 25;
 
-// =======================
-// HELPERS
-// =======================
-function shortAddr(addr) {
-  if (!addr || addr.length < 10) return addr;
+/* =====================
+   HELPERS
+===================== */
+function normalize(addr) {
+  return addr.toLowerCase().trim().replace(/^0x0+/, "0x");
+}
+
+function short(addr) {
   return addr.slice(0, 6) + "..." + addr.slice(-4);
 }
 
-function formatTime(ts) {
-  return new Date(ts).toLocaleString();
-}
-
-function normalize(addr) {
-  return addr.toLowerCase().replace(/^0x0+/, "0x");
-}
-
-function timeAgo(ts) {
-  const diff = Math.floor((Date.now() - new Date(ts)) / 1000);
-  if (diff < 60) return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  return `${Math.floor(diff / 86400)}d ago`;
-}
-
-// =======================
-// LOAD STATS
-// =======================
+/* =====================
+   LOAD STATS
+===================== */
 async function loadStats() {
   const res = await fetch("/api/stats");
-  const stats = await res.json();
+  const data = await res.json();
 
-  document.getElementById("totalRegistered").innerText =
-    stats.totalRegistered;
-
-  document.getElementById("ogMinters").innerText =
-    stats.ogMinters;
-
-  document.getElementById("uniqueAddresses").innerText =
-    stats.uniqueAddresses;
-
+  document.getElementById("totalRegistered").innerText = data.totalRegistered;
+  document.getElementById("ogMinters").innerText = data.ogMinters;
+  document.getElementById("uniqueAddresses").innerText = data.uniqueAddresses;
   document.getElementById("totalOgRegistered").innerText =
-    stats.totalOgRegistered;
+    data.totalOgRegistered;
 }
 
-// =======================
-// LOAD EVENTS
-// =======================
+/* =====================
+   LOAD EVENTS
+===================== */
 async function loadEvents() {
   const res = await fetch("/api/events");
   allEvents = await res.json();
-
-  currentPage = 1;
+  filteredEvents = allEvents;
   renderEvents();
 }
 
-// =======================
-// RENDER EVENTS (DESKTOP + MOBILE)
-// =======================
-function renderEvents(events = allEvents) {
+/* =====================
+   SEARCH WALLET (FIXED)
+===================== */
+async function checkWallet() {
+  const input = document.getElementById("walletInput").value;
+  if (!input) {
+    alert("Enter wallet address");
+    return;
+  }
+
+  const address = normalize(input);
+  const url = `/api/search?address=${encodeURIComponent(address)}`;
+
+  try {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      console.error("Search HTTP error", res.status);
+      alert("Search failed");
+      return;
+    }
+
+    const data = await res.json();
+
+    if (!data.registered) {
+      alert("Wallet not registered");
+      return;
+    }
+
+    filteredEvents = data.events;
+    currentPage = 1;
+    renderEvents();
+
+  } catch (err) {
+    console.error("Search error:", err);
+    alert("Search failed");
+  }
+}
+
+/* =====================
+   RENDER EVENTS
+===================== */
+function renderEvents() {
   const tbody = document.getElementById("eventsBody");
   const cards = document.getElementById("cardsView");
 
   tbody.innerHTML = "";
   cards.innerHTML = "";
 
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const pageData = events.slice(start, start + PAGE_SIZE);
+  const start = (currentPage - 1) * pageSize;
+  const pageItems = filteredEvents.slice(start, start + pageSize);
 
-  if (!pageData.length) {
-    tbody.innerHTML =
-      `<tr><td colspan="7">No transactions found</td></tr>`;
-    return;
-  }
-
-  pageData.forEach(e => {
-    // ===== TABLE (DESKTOP) =====
+  pageItems.forEach(e => {
+    /* TABLE */
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>Verified</td>
-      <td title="${e.address}">${shortAddr(e.address)}</td>
-      <td title="${e.tx}">${shortAddr(e.tx)}</td>
+      <td>Register</td>
+      <td>${short(e.address)}</td>
+      <td>${short(e.tx)}</td>
       <td>${e.block}</td>
-      <td>${formatTime(e.time)}</td>
-      <td class="success">success</td>
-      <td>${e.og ? "⭐️ YES" : "NO"}</td>
+      <td>${e.time}</td>
+      <td class="success">Success</td>
+      <td>${e.og ? "✅" : "—"}</td>
     `;
     tbody.appendChild(tr);
 
-    // ===== CARD (MOBILE) =====
+    /* MOBILE CARD */
     const card = document.createElement("div");
     card.className = "tx-card";
     card.innerHTML = `
       <div class="card-header">
-        <span class="pill verified">✔ Verified</span>
-        ${e.og ? `<span class="pill og">👑 OG</span>` : ""}
+        <span class="pill verified">Verified</span>
         <span class="pill success">Success</span>
+        ${e.og ? '<span class="pill og">OG</span>' : ""}
       </div>
-
       <div class="card-body">
-        <div><span>User</span><b>${shortAddr(e.address)}</b></div>
-        <div><span>Tx</span><b>${shortAddr(e.tx)}</b></div>
-        <div><span>Block</span><b>${e.block}</b></div>
-        <div><span>Age</span><b>${timeAgo(e.time)}</b></div>
+        <span>User</span><b>${short(e.address)}</b>
+        <span>Tx</span><b>${short(e.tx)}</b>
+        <span>Block</span><b>${e.block}</b>
+        <span>Time</span><b>${e.time}</b>
       </div>
     `;
     cards.appendChild(card);
   });
 
   document.getElementById("pageInfo").innerText =
-    `Page ${currentPage} / ${Math.ceil(events.length / PAGE_SIZE)}`;
+    `Page ${currentPage}`;
 }
 
-// =======================
-// PAGINATION
-// =======================
+/* =====================
+   PAGINATION
+===================== */
 function nextPage() {
-  if (currentPage * PAGE_SIZE < allEvents.length) {
+  if (currentPage * pageSize < filteredEvents.length) {
     currentPage++;
     renderEvents();
   }
@@ -135,67 +145,13 @@ function prevPage() {
 }
 
 function changePageSize(size) {
-  PAGE_SIZE = Number(size);
+  pageSize = Number(size);
   currentPage = 1;
   renderEvents();
 }
 
-// =======================
-// SEARCH WALLET (FIXED)
-// =======================
-async function checkWallet() {
-  const input = document.getElementById("walletInput");
-  let raw = input.value;
-
-  if (!raw) {
-    alert("Enter wallet address");
-    return;
-  }
-
-  const address = normalize(raw);
-
-  try {
-    const url = `/api/search?address=${encodeURIComponent(address)}`;
-    const res = await fetch(url);
-
-    // 🔍 DEBUG (important)
-    if (!res.ok) {
-      console.error("API failed:", res.status, await res.text());
-      alert("Search failed");
-      return;
-    }
-
-    const data = await res.json();
-
-    if (!data.registered) {
-      alert("Wallet NOT registered");
-      return;
-    }
-
-    currentPage = 1;
-    renderEvents(data.events);
-
-    document.getElementById("pageInfo").innerText =
-      `Found ${data.count} registration(s)`;
-
-  } catch (err) {
-    console.error("Fetch error:", err);
-    alert("Search error");
-  }
-}
-// =======================
-// RESET VIEW
-// =======================
-function resetView() {
-  document.getElementById("walletInput").value = "";
-  currentPage = 1;
-  renderEvents();
-}
-
-// =======================
-// INIT
-// =======================
-document.addEventListener("DOMContentLoaded", () => {
-  loadStats();
-  loadEvents();
-});
+/* =====================
+   INIT
+===================== */
+loadStats();
+loadEvents();
