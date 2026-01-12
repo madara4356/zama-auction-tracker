@@ -1,30 +1,28 @@
 import fs from "fs";
 import path from "path";
 
-const normalize = (a) =>
-  typeof a === "string" ? a.toLowerCase().replace(/^0x0+/, "0x") : null;
+const normalize = a => a.toLowerCase().replace(/^0x0+/, "0x");
 
 export default function handler(req, res) {
-  const dataPath = path.join(process.cwd(), "api/data");
+  const dataDir = path.join(process.cwd(), "api", "data");
 
   const registrations = JSON.parse(
-    fs.readFileSync(path.join(dataPath, "zama_registrations_map.json"))
+    fs.readFileSync(path.join(dataDir, "zama_registrations_map.json"), "utf8")
   );
 
-  const ogRaw = JSON.parse(
-    fs.readFileSync(path.join(dataPath, "og_minters.json"))
-  );
+  const og = JSON.parse(
+    fs.readFileSync(path.join(dataDir, "og_minters.json"), "utf8")
+  ).map(normalize);
 
-  const ogMinters = new Set(ogRaw.map(normalize));
-  const registeredSet = new Set(Object.keys(registrations).map(normalize));
+  const registered = Object.keys(registrations).map(normalize);
+  const ogSet = new Set(og);
 
-  let totalOgRegistered = 0;
-  for (const a of ogMinters) if (registeredSet.has(a)) totalOgRegistered++;
+  let totalOgRegistered = registered.filter(a => ogSet.has(a)).length;
 
-  res.status(200).json({
-    totalRegistered: registeredSet.size,
-    uniqueAddresses: registeredSet.size,
-    ogMinters: ogMinters.size,
+  res.json({
+    totalRegistered: registered.length,
+    uniqueAddresses: registered.length,
+    ogMinters: ogSet.size,
     totalOgRegistered
   });
 }
