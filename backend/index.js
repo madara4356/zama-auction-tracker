@@ -25,6 +25,24 @@ const registrationsPath = path.join(
 const ogMintersPath = path.join(__dirname, "data", "og_minters.json");
 
 let registrations = {};
+
+const express = require("express");
+const path = require("path");
+
+const app = express();
+
+app.use(express.json());
+
+// ✅ serve frontend files
+app.use(express.static(path.join(__dirname, "..")));
+
+// ✅ API test
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+// ❌ NO app.listen
+module.exports = app;
 let ogMinters = new Set();
 
 // Load registrations
