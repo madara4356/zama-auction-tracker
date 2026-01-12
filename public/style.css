@@ -1,0 +1,248 @@
+/* =========================
+   GLOBAL RESET
+========================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #0b0f14;
+  color: #ffffff;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* =========================
+   HEADER
+========================= */
+h1 {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: #9ca3af;
+  margin-bottom: 24px;
+}
+
+/* =========================
+   STATS
+========================= */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #121821;
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.card span {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.card h2 {
+  margin-top: 6px;
+  font-size: 22px;
+}
+
+/* =========================
+   SEARCH BAR
+========================= */
+.search-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #121821;
+  color: white;
+}
+
+.search-bar button {
+  padding: 12px 20px;
+  background: #22c55e;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* =========================
+   TABLE (DESKTOP)
+========================= */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #121821;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+tbody tr {
+  border-bottom: 1px solid #1f2937;
+}
+
+.success {
+  color: #22c55e;
+}
+
+/* =========================
+   PAGINATION
+========================= */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 24px 0;
+}
+
+.pagination button,
+.pagination select {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #121821;
+  color: white;
+}
+
+/* =========================
+   MOBILE CARD VIEW
+========================= */
+.cards-view {
+  display: none;
+}
+
+.tx-card {
+  background: #0f172a;
+  border-radius: 14px;
+  padding: 16px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 0 0 1px #1f2937;
+}
+
+.card-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pill {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.pill.verified {
+  background: #e6f7ee;
+  color: #16a34a;
+}
+
+.pill.success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.pill.og {
+  background: #facc15;
+  color: #000;
+}
+
+.card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+
+.card-body span {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.card-body b {
+  font-size: 14px;
+  color: #facc15;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+/* Hide table on mobile */
+@media (max-width: 900px) {
+  table {
+    display: none;
+  }
+
+  .cards-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+  }
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 22px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+
+  .search-bar input,
+  .search-bar button {
+    width: 100%;
+  }
+
+  .pagination {
+    flex-direction: column;
+  }
+
+  .pagination button,
+  .pagination select {
+    width: 100%;
+    max-width: 320px;
+  }
+}
