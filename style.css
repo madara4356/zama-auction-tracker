@@ -1,0 +1,267 @@
+/* =========================
+   GLOBAL RESET
+========================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #0b0f14;
+  color: #ffffff;
+  font-family: Inter, Arial, sans-serif;
+  padding: 30px;
+}
+
+/* =========================
+   HEADER
+========================= */
+h1 {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: #9ca3af;
+  margin-bottom: 20px;
+}
+
+/* =========================
+   STATS
+========================= */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #121821;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.card span {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.card h2 {
+  margin-top: 6px;
+  font-size: 22px;
+}
+
+/* =========================
+   SEARCH BAR
+========================= */
+.search-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #121821;
+  color: white;
+}
+
+.search-bar input::placeholder {
+  color: #6b7280;
+}
+
+.search-bar button {
+  padding: 12px 20px;
+  background: #22c55e;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* =========================
+   TABLE (DESKTOP)
+========================= */
+.table-wrapper {
+  margin-top: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #121821;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+tbody tr {
+  border-bottom: 1px solid #1f2937;
+}
+
+.success {
+  color: #22c55e;
+}
+
+/* =========================
+   PAGINATION
+========================= */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.pagination button,
+.pagination select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background: #121821;
+  color: white;
+}
+
+/* =========================
+   MOBILE CARD VIEW
+========================= */
+.cards-view {
+  display: none;
+}
+
+.tx-card {
+  background: #0f172a;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 0 0 1px #1f2937;
+}
+
+.card-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.pill {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.pill.verified {
+  background: #e6f7ee;
+  color: #16a34a;
+}
+
+.pill.success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.pill.og {
+  background: #facc15;
+  color: #000;
+}
+
+.card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+
+.card-body span {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.card-body b {
+  font-size: 14px;
+  color: #facc15;
+}
+
+/* =========================
+   RESPONSIVE SWITCH
+========================= */
+
+/* DESKTOP */
+@media (min-width: 900px) {
+  .cards-view {
+    display: none;
+  }
+}
+
+/* TABLE OFF ON MOBILE */
+@media (max-width: 899px) {
+  table {
+    display: none;
+  }
+}
+
+/* MOBILE FIXES */
+@media (max-width: 768px) {
+
+  body {
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  /* STATS */
+  .stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  /* SEARCH */
+  .search-bar {
+    flex-direction: column;
+  }
+
+  .search-bar input,
+  .search-bar button {
+    width: 100%;
+  }
+
+  /* CARDS */
+  .cards-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .tx-card {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* PAGINATION */
+  .pagination {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pagination button,
+  .pagination select {
+    width: 90%;
+    max-width: 320px;
+  }
+}
