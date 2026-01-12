@@ -1,79 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZAMA Auction Registration Track</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <!-- IMPORTANT: leading / -->
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
   <div class="page">
 
-  <h1>ZAMA Auction Registration Track</h1>
-  <p class="subtitle">Check registration & OG minter status</p>
+    <h1>ZAMA Auction Registration Track</h1>
+    <p class="subtitle">Check registration & OG minter status</p>
 
-  <!-- STATS -->
-  <div class="stats">
-    <div class="card">
-      <span>Total Registered</span>
-      <h2 id="totalRegistered">0</h2>
+    <!-- STATS -->
+    <div class="stats">
+      <div class="card">
+        <span>Total Registered</span>
+        <h2 id="totalRegistered">0</h2>
+      </div>
+
+      <div class="card">
+        <span>OG Minters</span>
+        <h2 id="ogMinters">0</h2>
+      </div>
+
+      <div class="card">
+        <span>Unique Addresses</span>
+        <h2 id="uniqueAddresses">0</h2>
+      </div>
+
+      <div class="card">
+        <span>Total OG Registered</span>
+        <h2 id="totalOgRegistered">0</h2>
+      </div>
     </div>
-    <div class="card">
-      <span>OG Minters</span>
-      <h2 id="ogMinters">0</h2>
+
+    <!-- SEARCH -->
+    <div class="search-bar">
+      <input id="walletInput" placeholder="0x..." />
+      <button onclick="checkWallet()" class="btn">Check Wallet</button>
     </div>
-    <div class="card">
-      <span>Unique Addresses</span>
-      <h2 id="uniqueAddresses">0</h2>
+
+    <!-- MOBILE CARD VIEW -->
+    <div id="cardsView" class="cards-view"></div>
+
+    <!-- TABLE -->
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Address</th>
+            <th>Tx</th>
+            <th>Block</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>OG</th>
+          </tr>
+        </thead>
+        <tbody id="eventsBody"></tbody>
+      </table>
+
+      <!-- PAGINATION -->
+      <div class="pagination">
+        <button onclick="prevPage()">⬅ Prev</button>
+        <span id="pageInfo">Page 1</span>
+        <button onclick="nextPage()">Next ➡</button>
+
+        <select onchange="changePageSize(this.value)">
+          <option value="25">25 / page</option>
+          <option value="50">50 / page</option>
+          <option value="100">100 / page</option>
+        </select>
+      </div>
     </div>
-    <div class="card">
-      <span>Total OG Registered</span>
-      <h2 id="totalOgRegistered">0</h2>
-    </div>
+
   </div>
 
-  <!-- SEARCH (NOW BELOW STATS ✅) -->
-  <div class="search-bar">
-    <input id="walletInput" placeholder="0x..." />
-    <button onclick="checkWallet()" class="btn">Check Wallet</button>
-  </div>
-
-  <!-- MOBILE CARD VIEW -->
-<div id="cardsView" class="cards-view"></div>
-
-  <!-- TABLE -->
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>Event</th>
-          <th>Address</th>
-          <th>Tx</th>
-          <th>Block</th>
-          <th>Time</th>
-          <th>Status</th>
-          <th>OG</th>
-        </tr>
-      </thead>
-      <tbody id="eventsBody"></tbody>
-    </table>
-    <!-- PAGINATION CONTROLS -->
-<div class="pagination">
-  <button onclick="prevPage()">⬅ Prev</button>
-
-  <span id="pageInfo">Page 1</span>
-
-  <button onclick="nextPage()">Next ➡</button>
-
-  <select onchange="changePageSize(this.value)">
-    <option value="25">25 / page</option>
-    <option value="50">50 / page</option>
-    <option value="100">100 / page</option>
-  </select>
-</div>
-  </div>
- </div>
-  <script src="frontend.js"></script>
+  <!-- IMPORTANT: leading / -->
+  <script src="/frontend.js"></script>
 </body>
 </html>
