@@ -145,7 +145,7 @@ function changePageSize(size) {
 // =======================
 async function checkWallet() {
   const input = document.getElementById("walletInput");
-  const raw = input.value.trim();
+  let raw = input.value;
 
   if (!raw) {
     alert("Enter wallet address");
@@ -155,9 +155,12 @@ async function checkWallet() {
   const address = normalize(raw);
 
   try {
-    const res = await fetch(`/api/search?address=${address}`);
+    const url = `/api/search?address=${encodeURIComponent(address)}`;
+    const res = await fetch(url);
 
+    // 🔍 DEBUG (important)
     if (!res.ok) {
+      console.error("API failed:", res.status, await res.text());
       alert("Search failed");
       return;
     }
@@ -176,7 +179,7 @@ async function checkWallet() {
       `Found ${data.count} registration(s)`;
 
   } catch (err) {
-    console.error(err);
+    console.error("Fetch error:", err);
     alert("Search error");
   }
 }
