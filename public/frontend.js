@@ -2,9 +2,9 @@
 // CONFIG
 // =======================
 let visibleEvents = [];
+let allEvents = [];
 let PAGE_SIZE = 25;
 let currentPage = 1;
-let allEvents = [];
 
 // =======================
 // HELPERS
@@ -16,10 +16,6 @@ function shortAddr(addr) {
 
 function formatTime(ts) {
   return new Date(ts).toLocaleString();
-}
-
-function normalize(addr) {
-  return addr.toLowerCase().replace(/^0x0+/, "0x");
 }
 
 function timeAgo(ts) {
@@ -49,7 +45,7 @@ async function loadStats() {
 async function loadEvents() {
   const res = await fetch("/api/events");
   allEvents = await res.json();
-  visibleEvents = allEvents;   // 👈 important
+  visibleEvents = allEvents;
   currentPage = 1;
   renderEvents();
 }
@@ -70,8 +66,8 @@ function renderEvents() {
   if (!pageData.length) return;
 
   pageData.forEach(e => {
-    const next = document.createElement("tr");
-    next.innerHTML = `
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
       <td>Verified</td>
       <td title="${e.address}">${shortAddr(e.address)}</td>
       <td title="${e.tx}">${shortAddr(e.tx)}</td>
@@ -80,7 +76,7 @@ function renderEvents() {
       <td class="success">success</td>
       <td>${e.og ? "⭐️ YES" : "NO"}</td>
     `;
-    tbody.appendChild(next);
+    tbody.appendChild(tr);
 
     const card = document.createElement("div");
     card.className = "tx-card";
@@ -108,7 +104,6 @@ function renderEvents() {
 // PAGINATION
 // =======================
 function nextPage() {
-function nextPage() {
   if (currentPage * PAGE_SIZE < visibleEvents.length) {
     currentPage++;
     renderEvents();
@@ -122,10 +117,15 @@ function prevPage() {
   }
 }
 
+function changePageSize(size) {
+  PAGE_SIZE = parseInt(size, 10);
+  currentPage = 1;
+  renderEvents();
+}
+
 // =======================
 // SEARCH
 // =======================
-window.checkWallet = async function () {
 window.checkWallet = async function () {
   const input = document.getElementById("walletInput").value.trim();
 
@@ -134,8 +134,7 @@ window.checkWallet = async function () {
     return;
   }
 
-  const address = input.toLowerCase();
-  const url = `/api/search?address=${encodeURIComponent(address)}`;
+  const url = `/api/search?address=${encodeURIComponent(input.toLowerCase())}`;
 
   let res;
   try {
@@ -147,7 +146,6 @@ window.checkWallet = async function () {
   }
 
   if (!res.ok) {
-    console.error("API status:", res.status);
     alert("Wallet not found");
     return;
   }
@@ -159,9 +157,11 @@ window.checkWallet = async function () {
     return;
   }
 
+  visibleEvents = data.events;   // ✅ CRITICAL
   currentPage = 1;
   renderEvents();
 };
+
 // =======================
 // INIT
 // =======================
