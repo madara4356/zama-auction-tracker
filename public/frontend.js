@@ -131,23 +131,44 @@ function changePageSize(size) {
 // =======================
 // SEARCH
 // =======================
-async function checkWallet() {
+window.checkWallet = async function () {
   const rawInput = document.getElementById("walletInput").value.trim();
-  if (!rawInput) return alert("Enter wallet address");
-
-  const address = normalize(rawInput);
-  const res = await fetch(`/api/search/${address}`);
-  const data = await res.json();
-
-  if (!data.registered) {
-    alert("Wallet not registered");
+  if (!rawInput) {
+    alert("Enter wallet address");
     return;
   }
 
-  currentPage = 1;
-  renderEvents(data.events);
-}
+  // frontend-safe normalize
+  const address = rawInput.toLowerCase();
 
+  try {
+    const res = await fetch(`/api/search/${address}`);
+    if (!res.ok) throw new Error("API error");
+
+    const data = await res.json();
+
+    if (!data.registered || data.events.length === 0) {
+      alert("Wallet not registered");
+      return;
+    }
+
+    // overwrite global events with searched results
+    events = data.events;
+    currentPage = 1;
+
+    renderEvents(events);
+
+    alert(
+      `✅ Wallet Found\n` +
+      `OG: ${data.og ? "Yes" : "No"}\n` +
+      `Events: ${data.events.length}`
+    );
+
+  } catch (err) {
+    console.error(err);
+    alert("Search failed");
+  }
+};
 // =======================
 // INIT
 // =======================
