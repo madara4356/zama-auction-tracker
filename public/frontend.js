@@ -1,10 +1,10 @@
 // =======================
 // CONFIG
 // =======================
-let visibleEvents = [];
-let allEvents = [];
 let PAGE_SIZE = 25;
 let currentPage = 1;
+let allEvents = [];
+let visibleEvents = [];
 
 // =======================
 // HELPERS
@@ -51,7 +51,7 @@ async function loadEvents() {
 }
 
 // =======================
-// RENDER EVENTS
+// RENDER
 // =======================
 function renderEvents() {
   const tbody = document.getElementById("eventsBody");
@@ -63,18 +63,16 @@ function renderEvents() {
   const start = (currentPage - 1) * PAGE_SIZE;
   const pageData = visibleEvents.slice(start, start + PAGE_SIZE);
 
-  if (!pageData.length) return;
-
   pageData.forEach(e => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>Verified</td>
-      <td title="${e.address}">${shortAddr(e.address)}</td>
-      <td title="${e.tx}">${shortAddr(e.tx)}</td>
+      <td>${shortAddr(e.address)}</td>
+      <td>${shortAddr(e.tx)}</td>
       <td>${e.block}</td>
       <td>${formatTime(e.time)}</td>
       <td class="success">success</td>
-      <td>${e.og ? "⭐️ YES" : "NO"}</td>
+      <td>${e.og ? "⭐ YES" : "NO"}</td>
     `;
     tbody.appendChild(tr);
 
@@ -82,7 +80,7 @@ function renderEvents() {
     card.className = "tx-card";
     card.innerHTML = `
       <div class="card-header">
-        <span class="pill verified">✔️ Verified</span>
+        <span class="pill verified">✔ Verified</span>
         ${e.og ? `<span class="pill og">👑 OG</span>` : ""}
         <span class="pill success">Success</span>
       </div>
@@ -128,28 +126,9 @@ function changePageSize(size) {
 // =======================
 window.checkWallet = async function () {
   const input = document.getElementById("walletInput").value.trim();
+  if (!input) return alert("Enter wallet address");
 
-  if (!input) {
-    alert("Enter wallet address");
-    return;
-  }
-
-  const url = `/api/search?address=${encodeURIComponent(input.toLowerCase())}`;
-
-  let res;
-  try {
-    res = await fetch(url);
-  } catch (e) {
-    console.error("Fetch failed:", e);
-    alert("Network error");
-    return;
-  }
-
-  if (!res.ok) {
-    alert("Wallet not found");
-    return;
-  }
-
+  const res = await fetch(`/api/search?address=${encodeURIComponent(input)}`);
   const data = await res.json();
 
   if (!data.registered || !data.events.length) {
@@ -157,7 +136,7 @@ window.checkWallet = async function () {
     return;
   }
 
-  visibleEvents = data.events;   // ✅ CRITICAL
+  visibleEvents = data.events;   // 🔥 THIS WAS MISSING
   currentPage = 1;
   renderEvents();
 };
