@@ -45,6 +45,10 @@ async function loadStats() {
 async function loadEvents() {
   const res = await fetch("/api/events");
   allEvents = await res.json();
+
+  // ✅ sort: most recent first
+  allEvents.sort((a, b) => new Date(b.time) - new Date(a.time));
+
   visibleEvents = allEvents;
   currentPage = 1;
   renderEvents();
