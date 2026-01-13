@@ -132,40 +132,40 @@ function changePageSize(size) {
 // SEARCH
 // =======================
 window.checkWallet = async function () {
-  const rawInput = document.getElementById("walletInput").value.trim();
-  if (!rawInput) {
+  const input = document.getElementById("walletInput");
+  const raw = input.value.trim();
+
+  if (!raw) {
     alert("Enter wallet address");
     return;
   }
 
-  // frontend-safe normalize
-  const address = rawInput.toLowerCase();
+  const address = raw.toLowerCase();
+  const url = `/api/search/${encodeURIComponent(address)}`;
 
   try {
-    const res = await fetch(`/api/search/${address}`);
-    if (!res.ok) throw new Error("API error");
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      console.error("API status:", res.status);
+      throw new Error("API failed");
+    }
 
     const data = await res.json();
 
-    if (!data.registered || data.events.length === 0) {
+    if (!data.registered || !data.events || data.events.length === 0) {
       alert("Wallet not registered");
       return;
     }
 
-    // overwrite global events with searched results
+    // overwrite global state
     events = data.events;
     currentPage = 1;
 
     renderEvents(events);
 
-    alert(
-      `✅ Wallet Found\n` +
-      `OG: ${data.og ? "Yes" : "No"}\n` +
-      `Events: ${data.events.length}`
-    );
-
   } catch (err) {
-    console.error(err);
+    console.error("Search error:", err);
     alert("Search failed");
   }
 };
