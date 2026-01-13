@@ -1,6 +1,7 @@
 // =======================
 // CONFIG
 // =======================
+let visibleEvents = [];
 let PAGE_SIZE = 25;
 let currentPage = 1;
 let allEvents = [];
@@ -48,6 +49,7 @@ async function loadStats() {
 async function loadEvents() {
   const res = await fetch("/api/events");
   allEvents = await res.json();
+  visibleEvents = allEvents;   // 👈 important
   currentPage = 1;
   renderEvents();
 }
@@ -55,7 +57,7 @@ async function loadEvents() {
 // =======================
 // RENDER EVENTS
 // =======================
-function renderEvents(events = allEvents) {
+function renderEvents() {
   const tbody = document.getElementById("eventsBody");
   const cards = document.getElementById("cardsView");
 
@@ -63,14 +65,13 @@ function renderEvents(events = allEvents) {
   cards.innerHTML = "";
 
   const start = (currentPage - 1) * PAGE_SIZE;
-  const pageData = events.slice(start, start + PAGE_SIZE);
+  const pageData = visibleEvents.slice(start, start + PAGE_SIZE);
 
   if (!pageData.length) return;
 
   pageData.forEach(e => {
-    // TABLE (DESKTOP)
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
+    const next = document.createElement("tr");
+    next.innerHTML = `
       <td>Verified</td>
       <td title="${e.address}">${shortAddr(e.address)}</td>
       <td title="${e.tx}">${shortAddr(e.tx)}</td>
@@ -79,9 +80,8 @@ function renderEvents(events = allEvents) {
       <td class="success">success</td>
       <td>${e.og ? "⭐️ YES" : "NO"}</td>
     `;
-    tbody.appendChild(tr);
+    tbody.appendChild(next);
 
-    // CARD (MOBILE)
     const card = document.createElement("div");
     card.className = "tx-card";
     card.innerHTML = `
@@ -90,7 +90,6 @@ function renderEvents(events = allEvents) {
         ${e.og ? `<span class="pill og">👑 OG</span>` : ""}
         <span class="pill success">Success</span>
       </div>
-
       <div class="card-body">
         <div><span>User</span><b>${shortAddr(e.address)}</b></div>
         <div><span>Tx</span><b>${shortAddr(e.tx)}</b></div>
@@ -102,14 +101,15 @@ function renderEvents(events = allEvents) {
   });
 
   document.getElementById("pageInfo").innerText =
-    `Page ${currentPage} / ${Math.ceil(events.length / PAGE_SIZE)}`;
+    `Page ${currentPage} / ${Math.ceil(visibleEvents.length / PAGE_SIZE)}`;
 }
 
 // =======================
 // PAGINATION
 // =======================
 function nextPage() {
-  if (currentPage * PAGE_SIZE < allEvents.length) {
+function nextPage() {
+  if (currentPage * PAGE_SIZE < visibleEvents.length) {
     currentPage++;
     renderEvents();
   }
@@ -122,24 +122,20 @@ function prevPage() {
   }
 }
 
-function changePageSize(size) {
-  PAGE_SIZE = parseInt(size, 10);
-  currentPage = 1;
-  renderEvents();
-}
-
 // =======================
 // SEARCH
 // =======================
 window.checkWallet = async function () {
-  const raw = document.getElementById("walletInput").value.trim();
-  if (!raw) {
+window.checkWallet = async function () {
+  const input = document.getElementById("walletInput").value.trim();
+
+  if (!input) {
     alert("Enter wallet address");
     return;
   }
 
-  const address = raw.toLowerCase();
-  const url = `/api/search?address=${address}`;
+  const address = input.toLowerCase();
+  const url = `/api/search?address=${encodeURIComponent(address)}`;
 
   let res;
   try {
@@ -158,14 +154,13 @@ window.checkWallet = async function () {
 
   const data = await res.json();
 
-  if (!data.registered || !data.events?.length) {
+  if (!data.registered || !data.events.length) {
     alert("Wallet not registered");
     return;
   }
 
-  events = data.events;
   currentPage = 1;
-  renderEvents(events);
+  renderEvents();
 };
 // =======================
 // INIT
