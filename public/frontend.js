@@ -1,6 +1,8 @@
 // =======================
 // CONFIG
 // =======================
+const ETHERSCAN_BASE = "https://etherscan.io";
+
 let PAGE_SIZE = 25;
 let currentPage = 1;
 let allEvents = [];
@@ -36,7 +38,8 @@ async function loadStats() {
   document.getElementById("totalRegistered").innerText = stats.totalRegistered;
   document.getElementById("ogMinters").innerText = stats.ogMinters;
   document.getElementById("uniqueAddresses").innerText = stats.uniqueAddresses;
-  document.getElementById("totalOgRegistered").innerText = stats.totalOgRegistered;
+  document.getElementById("totalOgRegistered").innerText =
+    stats.totalOgRegistered;
 }
 
 // =======================
@@ -46,7 +49,7 @@ async function loadEvents() {
   const res = await fetch("/api/events");
   allEvents = await res.json();
 
-  // ✅ sort: most recent first
+  // newest first
   allEvents.sort((a, b) => new Date(b.time) - new Date(a.time));
 
   visibleEvents = allEvents;
@@ -55,7 +58,7 @@ async function loadEvents() {
 }
 
 // =======================
-// RENDER
+// RENDER EVENTS
 // =======================
 function renderEvents() {
   const tbody = document.getElementById("eventsBody");
@@ -67,30 +70,57 @@ function renderEvents() {
   const start = (currentPage - 1) * PAGE_SIZE;
   const pageData = visibleEvents.slice(start, start + PAGE_SIZE);
 
+  if (!pageData.length) return;
+
   pageData.forEach(e => {
+    // TABLE
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>Verified</td>
-      <td>${shortAddr(e.address)}</td>
-      <td>${shortAddr(e.tx)}</td>
+      <td>
+        <a href="${ETHERSCAN_BASE}/address/${e.address}" target="_blank">
+          ${shortAddr(e.address)}
+        </a>
+      </td>
+      <td>
+        <a href="${ETHERSCAN_BASE}/tx/${e.tx}" target="_blank">
+          ${shortAddr(e.tx)}
+        </a>
+      </td>
       <td>${e.block}</td>
       <td>${formatTime(e.time)}</td>
       <td class="success">success</td>
-      <td>${e.og ? "⭐ YES" : "NO"}</td>
+      <td>${e.og ? "⭐️ YES" : "NO"}</td>
     `;
     tbody.appendChild(tr);
 
+    // MOBILE CARD
     const card = document.createElement("div");
     card.className = "tx-card";
     card.innerHTML = `
       <div class="card-header">
-        <span class="pill verified">✔ Verified</span>
+        <span class="pill verified">✔️ Verified</span>
         ${e.og ? `<span class="pill og">👑 OG</span>` : ""}
         <span class="pill success">Success</span>
       </div>
+
       <div class="card-body">
-        <div><span>User</span><b>${shortAddr(e.address)}</b></div>
-        <div><span>Tx</span><b>${shortAddr(e.tx)}</b></div>
+        <div>
+          <span>User</span>
+          <b>
+            <a href="${ETHERSCAN_BASE}/address/${e.address}" target="_blank">
+              ${shortAddr(e.address)}
+            </a>
+          </b>
+        </div>
+        <div>
+          <span>Tx</span>
+          <b>
+            <a href="${ETHERSCAN_BASE}/tx/${e.tx}" target="_blank">
+              ${shortAddr(e.tx)}
+            </a>
+          </b>
+        </div>
         <div><span>Block</span><b>${e.block}</b></div>
         <div><span>Age</span><b>${timeAgo(e.time)}</b></div>
       </div>
@@ -143,7 +173,7 @@ window.checkWallet = async function () {
   visibleEvents = data.events;   // 🔥 THIS WAS MISSING
   currentPage = 1;
   renderEvents();
-};
+};;
 
 // =======================
 // INIT
