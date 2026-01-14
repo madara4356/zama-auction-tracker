@@ -16,7 +16,7 @@ body {
 .page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 18px;
 }
 
 /* =========================
@@ -24,21 +24,23 @@ body {
 ========================= */
 .header {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 18px;
 }
 
 h1 {
-  font-size: 28px;
-  margin-bottom: 6px;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 4px;
 }
 
 .subtitle {
   color: #9ca3af;
-  margin-bottom: 10px;
+  font-size: 14px;
+  margin-bottom: 6px;
 }
 
 .builder {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #9ca3af;
 }
@@ -55,9 +57,10 @@ h1 {
 .header-meta {
   display: flex;
   justify-content: center;
-  gap: 14px;
+  gap: 12px;
   font-size: 12px;
   color: #9ca3af;
+  margin-top: 4px;
 }
 
 .live-dot {
@@ -66,31 +69,33 @@ h1 {
 }
 
 /* =========================
-   STATS
+   STATS (REFINED)
 ========================= */
 .stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .card {
   background: linear-gradient(180deg, #121821, #0f172a);
-  padding: 18px;
-  border-radius: 14px;
+  padding: 14px;
+  border-radius: 12px;
   text-align: center;
   box-shadow: 0 0 0 1px #1f2937;
 }
 
 .card span {
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 500;
   color: #9ca3af;
 }
 
 .card h2 {
-  margin-top: 6px;
-  font-size: 24px;
+  margin-top: 4px;
+  font-size: 22px;
+  font-weight: 700;
   color: #facc15;
 }
 
@@ -100,12 +105,12 @@ h1 {
 .search-bar {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .search-bar input {
   flex: 1;
-  padding: 14px;
+  padding: 13px;
   border-radius: 10px;
   border: none;
   background: #121821;
@@ -114,17 +119,17 @@ h1 {
 }
 
 .search-bar button {
-  padding: 14px 24px;
+  padding: 13px 22px;
   background: linear-gradient(135deg, #22c55e, #16a34a);
   border: none;
   border-radius: 10px;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
   color: #000;
 }
 
 /* =========================
-   TABLE
+   TABLE (PROFESSIONAL)
 ========================= */
 .table-wrapper {
   width: 100%;
@@ -133,25 +138,45 @@ h1 {
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 8px;
 }
 
-thead {
-  background: #121821;
-}
-
-th, td {
-  padding: 12px;
-  text-align: left;
-  font-size: 14px;
+thead th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  padding: 10px 12px;
 }
 
 tbody tr {
-  border-bottom: 1px solid #1f2937;
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: 10px;
+}
+
+td {
+  padding: 12px 14px;
+  font-size: 13px;
 }
 
 .success {
   color: #22c55e;
+  font-weight: 600;
+}
+
+/* =========================
+   LINK STYLING
+========================= */
+a.link {
+  color: #60a5fa;
+  font-family: monospace;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+a.link:hover {
+  text-decoration: underline;
 }
 
 /* =========================
@@ -162,7 +187,7 @@ tbody tr {
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin: 24px 0;
+  margin: 20px 0;
 }
 
 .pagination button,
@@ -183,8 +208,8 @@ tbody tr {
 
 .tx-card {
   background: linear-gradient(180deg, #0f172a, #020617);
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 14px;
+  padding: 14px;
   width: 100%;
   max-width: 420px;
   box-shadow: 0 0 0 1px #1f2937;
@@ -194,45 +219,75 @@ tbody tr {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .pill {
-  padding: 4px 12px;
-  font-size: 12px;
+  padding: 4px 10px;
+  font-size: 11px;
   border-radius: 999px;
   font-weight: 600;
 }
 
 .pill.verified {
-  background: #e6f7ee;
-  color: #16a34a;
+  background: rgba(22, 163, 74, 0.15);
+  color: #22c55e;
 }
 
 .pill.success {
-  background: #dcfce7;
-  color: #16a34a;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
 }
 
 .pill.og {
-  background: #facc15;
+  background: rgba(250, 204, 21, 0.9);
   color: #000;
 }
 
 .card-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px 12px;
+  gap: 6px 10px;
 }
 
 .card-body span {
-  font-size: 12px;
+  font-size: 11px;
   color: #9ca3af;
 }
 
 .card-body b {
-  font-size: 14px;
+  font-size: 13px;
   color: #facc15;
+}
+
+/* =========================
+   HOVER EFFECTS (DESKTOP)
+========================= */
+@media (hover: hover) and (pointer: fine) {
+  tbody tr {
+    transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+  }
+
+  tbody tr:hover {
+    background: linear-gradient(
+      90deg,
+      rgba(34, 197, 94, 0.08),
+      rgba(34, 197, 94, 0.02)
+    );
+    box-shadow:
+      inset 4px 0 0 #22c55e,
+      0 0 14px rgba(34, 197, 94, 0.15);
+    transform: translateY(-1px);
+  }
+}
+
+/* =========================
+   OG CARD GOLD GLOW (MOBILE)
+========================= */
+.tx-card:has(.pill.og) {
+  box-shadow:
+    0 0 0 1px rgba(250, 204, 21, 0.5),
+    0 0 18px rgba(250, 204, 21, 0.25);
 }
 
 /* =========================
@@ -247,18 +302,27 @@ tbody tr {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-    margin-top: 12px;
+    gap: 14px;
+    margin-top: 10px;
   }
 }
 
 @media (max-width: 768px) {
   h1 {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .stats {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .card h2 {
+    font-size: 20px;
   }
 
   .search-bar {
@@ -280,69 +344,22 @@ tbody tr {
     max-width: 320px;
   }
 }
-/* =========================
-   TABLE ROW HOVER GLOW
-========================= */
-
-/* Smooth transition */
-tbody tr {
-  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
-}
-
-/* Hover effect (desktop only) */
-@media (hover: hover) and (pointer: fine) {
-  tbody tr:hover {
-    background: linear-gradient(
-      90deg,
-      rgba(34, 197, 94, 0.08),
-      rgba(34, 197, 94, 0.02)
-    );
-
-    box-shadow:
-      inset 4px 0 0 #22c55e,
-      0 0 18px rgba(34, 197, 94, 0.15);
-
-    transform: translateY(-1px);
-  }
-}
-/* =========================
-   LINK GLOW (Address / Tx)
-========================= */
-a.link {
-  color: #3b82f6;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease, text-shadow 0.2s ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  a.link:hover {
-    color: #60a5fa;
-    text-shadow:
-      0 0 6px rgba(59, 130, 246, 0.6),
-      0 0 14px rgba(59, 130, 246, 0.4);
-  }
-}
 
 /* =========================
-   TABLE ROW HOVER (DESKTOP)
+   OG BADGE (DESKTOP TABLE)
 ========================= */
-@media (hover: hover) and (pointer: fine) {
-  tbody tr {
-    transition: background 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  tbody tr:hover {
-    background: rgba(34, 197, 94, 0.08);
-    box-shadow: inset 4px 0 0 #22c55e;
-  }
+.og-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(250, 204, 21, 0.18);
+  color: #facc15;
+  box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.4);
 }
 
-/* =========================
-   OG CARD GOLD GLOW (MOBILE)
-========================= */
-.tx-card:has(.pill.og) {
-  box-shadow:
-    0 0 0 1px rgba(250, 204, 21, 0.5),
-    0 0 22px rgba(250, 204, 21, 0.25);
+.og-empty {
+  color: #6b7280;
+  font-size: 13px;
 }

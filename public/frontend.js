@@ -52,7 +52,7 @@ async function loadEvents() {
   // newest first
   allEvents.sort((a, b) => new Date(b.time) - new Date(a.time));
 
-  visibleEvents = allEvents;
+  visibleEvents = [...allEvents];
   currentPage = 1;
   renderEvents();
 }
@@ -70,37 +70,59 @@ function renderEvents() {
   const start = (currentPage - 1) * PAGE_SIZE;
   const pageData = visibleEvents.slice(start, start + PAGE_SIZE);
 
-  if (!pageData.length) return;
+  if (!pageData.length) {
+    document.getElementById("pageInfo").innerText = "No results";
+    return;
+  }
 
   pageData.forEach(e => {
-    // TABLE
+    // ===================
+    // TABLE ROW
+    // ===================
     const tr = document.createElement("tr");
+
     tr.innerHTML = `
       <td>Verified</td>
+
       <td>
-        <a href="${ETHERSCAN_BASE}/address/${e.address}" target="_blank">
+        <a class="link" href="${ETHERSCAN_BASE}/address/${e.address}" target="_blank">
           ${shortAddr(e.address)}
         </a>
       </td>
+
       <td>
-        <a href="${ETHERSCAN_BASE}/tx/${e.tx}" target="_blank">
+        <a class="link" href="${ETHERSCAN_BASE}/tx/${e.tx}" target="_blank">
           ${shortAddr(e.tx)}
         </a>
       </td>
+
       <td>${e.block}</td>
+
       <td>${formatTime(e.time)}</td>
-      <td class="success">success</td>
-      <td>${e.og ? "⭐️ YES" : "NO"}</td>
+
+      <td class="success">Success</td>
+
+      <td>
+  ${
+    e.og
+      ? `<span class="og-badge">OG</span>`
+      : `<span class="og-empty">—</span>`
+  }
+</td>
     `;
+
     tbody.appendChild(tr);
 
+    // ===================
     // MOBILE CARD
+    // ===================
     const card = document.createElement("div");
     card.className = "tx-card";
+
     card.innerHTML = `
       <div class="card-header">
-        <span class="pill verified">✔️ Verified</span>
-        ${e.og ? `<span class="pill og">👑 OG</span>` : ""}
+        <span class="pill verified">Verified</span>
+        ${e.og ? `<span class="pill og">OG</span>` : ""}
         <span class="pill success">Success</span>
       </div>
 
@@ -108,23 +130,33 @@ function renderEvents() {
         <div>
           <span>User</span>
           <b>
-            <a href="${ETHERSCAN_BASE}/address/${e.address}" target="_blank">
+            <a class="link" href="${ETHERSCAN_BASE}/address/${e.address}" target="_blank">
               ${shortAddr(e.address)}
             </a>
           </b>
         </div>
+
         <div>
           <span>Tx</span>
           <b>
-            <a href="${ETHERSCAN_BASE}/tx/${e.tx}" target="_blank">
+            <a class="link" href="${ETHERSCAN_BASE}/tx/${e.tx}" target="_blank">
               ${shortAddr(e.tx)}
             </a>
           </b>
         </div>
-        <div><span>Block</span><b>${e.block}</b></div>
-        <div><span>Age</span><b>${timeAgo(e.time)}</b></div>
+
+        <div>
+          <span>Block</span>
+          <b>${e.block}</b>
+        </div>
+
+        <div>
+          <span>Age</span>
+          <b>${timeAgo(e.time)}</b>
+        </div>
       </div>
     `;
+
     cards.appendChild(card);
   });
 
@@ -160,20 +192,26 @@ function changePageSize(size) {
 // =======================
 window.checkWallet = async function () {
   const input = document.getElementById("walletInput").value.trim();
-  if (!input) return alert("Enter wallet address");
+  if (!input) {
+    alert("Enter wallet address");
+    return;
+  }
 
   const res = await fetch(`/api/search?address=${encodeURIComponent(input)}`);
   const data = await res.json();
 
-  if (!data.registered || !data.events.length) {
+  if (!data.registered || !data.events || !data.events.length) {
     alert("Wallet not registered");
     return;
   }
 
-  visibleEvents = data.events;   // 🔥 THIS WAS MISSING
+  visibleEvents = data.events.sort(
+    (a, b) => new Date(b.time) - new Date(a.time)
+  );
+
   currentPage = 1;
   renderEvents();
-};;
+};
 
 // =======================
 // INIT

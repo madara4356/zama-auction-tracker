@@ -13,12 +13,11 @@
 
     <!-- HEADER -->
     <div class="header">
-      <h1>
-        ZAMA Auction Registration Track
-        <span class="builder">
-          (Built by <a href="https://x.com/0x_madara_" target="_blank">madara</a>)
-        </span>
-      </h1>
+      <h1>ZAMA Auction Registration Track</h1>
+
+      <div class="subtitle">
+        Built by <a href="https://x.com/0x_madara_" target="_blank">madara</a>
+      </div>
 
       <div class="header-meta">
         <span class="live-dot">● Live</span>
@@ -28,31 +27,33 @@
 
     <!-- STATS -->
     <div class="stats">
+
       <div class="card">
-        <span>Total Registered</span>
+        <span>👥 Total Registered</span>
         <h2 id="totalRegistered">0</h2>
       </div>
 
       <div class="card">
-        <span>OG Minters</span>
+        <span>👑 OG Minters</span>
         <h2 id="ogMinters">0</h2>
       </div>
 
       <div class="card">
-        <span>Unique Addresses</span>
+        <span>🧾 Unique Addresses</span>
         <h2 id="uniqueAddresses">0</h2>
       </div>
 
       <div class="card">
-        <span>Total OG Registered</span>
+        <span>⭐ Total OG Registered</span>
         <h2 id="totalOgRegistered">0</h2>
       </div>
+
     </div>
 
     <!-- SEARCH -->
     <div class="search-bar">
-      <input id="walletInput" placeholder="0x..." />
-      <button onclick="checkWallet()" class="btn">Check Wallet</button>
+      <input id="walletInput" placeholder="Enter wallet address (0x...)" />
+      <button onclick="checkWallet()">Check Wallet</button>
     </div>
 
     <!-- MOBILE CARD VIEW -->
@@ -77,9 +78,9 @@
 
       <!-- PAGINATION -->
       <div class="pagination">
-        <button onclick="prevPage()">⬅️ Prev</button>
+        <button onclick="prevPage()">Prev</button>
         <span id="pageInfo">Page 1</span>
-        <button onclick="nextPage()">Next ➡️</button>
+        <button onclick="nextPage()">Next</button>
 
         <select onchange="changePageSize(this.value)">
           <option value="25">25 / page</option>
